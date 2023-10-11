@@ -1,0 +1,55 @@
+---
+  - hosts: Calypso
+    tasks:
+      - name: Gather package facts
+        package_facts:
+          manager: "auto"
+
+      - name: Install dependencies
+        apt:
+          name:
+            - debian-keyring
+            - debian-archive-keyring
+            - apt-transport-https
+          state: latest
+
+      - name: Add Caddy GPG key
+        shell: "curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg"
+        when: "'caddy' not in ansible_facts.packages"
+
+      - name: Add Caddy repo
+        shell: "curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list"
+        when: "'caddy' not in ansible_facts.packages"
+
+      - name: Update apt cache
+        apt:
+          update_cache: yes
+
+      - name: Install Caddy
+        apt:
+          name: caddy
+          state: latest
+
+      - name: Install Caddy
+        apt: name=caddy state=latest
+        
+      - name: Open port 80
+        ufw:
+          rule: allow
+          port: '80'
+          proto: tcp
+
+      - name: Open port 443
+        ufw:
+          rule: allow
+          port: '443'
+          proto: tcp
+
+      - name: Check Caddy service status
+        command: systemctl status caddy
+        register: caddy_status
+        ignore_errors: true
+
+      - name: Print Caddy service status
+        debug:
+          msg: "{{ caddy_status.stdout_lines }}"

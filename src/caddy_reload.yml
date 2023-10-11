@@ -1,0 +1,16 @@
+---
+- name: Reload Caddy Server
+  hosts: Calypso
+  become: yes
+  tasks:
+    - name: Reload Caddy
+      command: "systemctl reload caddy"
+
+    - name: Check Caddy Status
+      command: "systemctl status caddy"
+      register: caddy_status_output
+      ignore_errors: true
+
+    - name: Show Caddy Status
+      debug:
+        msg: "{{ caddy_status_output.stdout_lines }}"
