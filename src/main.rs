@@ -5,7 +5,7 @@ fn main() {
     let matches = App::new("Role Executor CLI tool")
         .version("0.1")
         .author("Alex Kucherenko")
-        .about("RoleX CLI for managing various tasks")
+        .about("CLI tool for managing server tasks")
         .subcommand(SubCommand::with_name("install").about("Installs ansible-playbook"))
         .subcommand(
             SubCommand::with_name("init").about("Initializes hosts.ini with your servers list"),

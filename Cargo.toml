@@ -5,6 +5,7 @@ authors = ["Alex Kucherenko <kucherenko.email@gmail.com>"]
 edition = "2018"
 description = "A CLI utility for managing server tasks"
 license = "MIT"
+repository = "https://github.com/AlexTiTanium/rolex"
 
 [dependencies]
 clap = "2.33.3"
