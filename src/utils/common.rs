@@ -24,7 +24,9 @@ pub fn is_installed(app: &str) -> Result<bool, std::io::Error> {
     }
 }
 
+///
 /// Check if the system is WSL
+///
 pub fn is_wsl() -> bool {
     env::var("WSL_DISTRO_NAME").is_ok()
 }
