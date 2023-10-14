@@ -1,7 +1,23 @@
 extern crate clap;
+extern crate log;
+extern crate pretty_env_logger;
+
+mod commands;
+mod utils;
+
 use clap::{App, SubCommand};
+use log::info;
+use std::io::Write;
 
 fn main() {
+    pretty_env_logger::formatted_timed_builder()
+        .filter(None, log::LevelFilter::Info)
+        .format(|buf, record| {
+            let level_style = buf.default_level_style(record.level());
+            writeln!(buf, "{}", level_style.value(record.args()),)
+        })
+        .init();
+
     let matches = App::new("Role Executor CLI tool")
         .version("0.1")
         .author("Alex Kucherenko")
@@ -19,27 +35,26 @@ fn main() {
 
     match matches.subcommand_name() {
         Some("install") => {
-            println!("Installing ansible-playbook...");
-            // TODO: Actual logic
+            commands::install_command();
         }
         Some("init") => {
-            println!("Initializing hosts.ini...");
+            info!("Initializing hosts.ini...");
             // TODO: Actual logic
         }
         Some("setup") => {
-            println!("Running setup...");
+            info!("Running setup...");
             // TODO: Actual logic
         }
         Some("user") => {
-            println!("Managing user...");
+            info!("Managing user...");
             // TODO: Actual logic
         }
         Some("reload") => {
-            println!("Reloading service...");
+            info!("Reloading service...");
             // TODO: Actual logic
         }
         _ => {
-            println!("Invalid command, run with --help for usage.");
+            info!("Invalid command, run with --help for usage.");
         }
     }
 }
