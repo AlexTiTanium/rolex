@@ -1,11 +1,12 @@
 ---
-- hosts: Calypso
-  tasks:      
+- name: Create new user for host
+  hosts: all
+  tasks:
     - name: Create new user
-      user: 
+      user:
         name: "{{ user }}"
         home: "/home/{{ user }}/"
-        
+
     - name: Add new user to Caddy group
       user:
         name: "{{ user }}"
@@ -36,12 +37,12 @@
     - name: Decode Caddyfile content
       set_fact:
         caddyfile_decoded: "{{ caddyfile_content['content'] | b64decode }}"
-      
+
     - name: Clear Caddyfile if no import statement exists
       lineinfile:
         path: /etc/caddy/Caddyfile
         state: absent
-        regexp: '.*'
+        regexp: ".*"
       when: "'import' not in caddyfile_decoded"
 
     - name: Modify Caddyfile
@@ -85,7 +86,7 @@
     - name: Copy public key to authorized_keys
       copy:
         remote_src: yes
-        mode: '0600'
+        mode: "0600"
         owner: "{{ user }}"
         group: "{{ user }}"
         src: "/home/{{ user }}/.ssh/id_ed25519.pub"

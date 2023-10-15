@@ -1,6 +1,6 @@
 ---
 - name: Reload Caddy Server
-  hosts: Calypso
+  hosts: all
   become: yes
   tasks:
     - name: Reload Caddy

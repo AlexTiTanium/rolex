@@ -66,7 +66,11 @@ fn main() {
             if available_hosts.contains(dynamic_command) {
                 match sub_matches.subcommand() {
                     ("setup", Some(_)) => {
-                        info!("setup server")
+                        commands::run_playbook(
+                            dynamic_command,
+                            "setup",
+                            include_str!("playbooks/setup.yml"),
+                        );
                     }
                     _ => {
                         info!("Invalid host command, run with --help for to get available commands")

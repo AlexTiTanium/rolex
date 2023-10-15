@@ -1,9 +1,10 @@
-use dirs::home_dir;
 use log::{error, info, warn};
 use std::env;
 use std::fs::File;
 use std::io::Write;
 use std::process::Command;
+
+use crate::utils;
 
 ///
 /// Command `hosts create`
@@ -33,14 +34,13 @@ pub fn hosts_edit_command() {
 /// Open hosts.init in default user editor
 ///
 fn open_hosts_in_default_editor() -> std::io::Result<()> {
-    let hosts_file_path = "~/.rolex/hosts.ini";
+    let hosts_file_path = utils::get_host_config_path();
 
     let os = env::consts::OS;
     match os {
         "linux" | "macos" => {
-            let path = "~/.rolex/hosts.ini";
             let editor = env::var("EDITOR").unwrap_or_else(|_| "vi".to_string());
-            Command::new(editor).arg(path).status()?;
+            Command::new(editor).arg(hosts_file_path).status()?;
         }
         "windows" => {
             Command::new("cmd")
@@ -60,9 +60,7 @@ fn open_hosts_in_default_editor() -> std::io::Result<()> {
 /// In this file we will store all user servers
 ///
 fn create_hosts_config() -> std::io::Result<()> {
-    // Get path to home directory
-    let home = home_dir().expect("Home directory not found");
-    let app_dir = home.join(".rolex");
+    let app_dir = utils::get_app_dir();
 
     // Create folder if not exist
     if !app_dir.exists() {
@@ -70,7 +68,7 @@ fn create_hosts_config() -> std::io::Result<()> {
     }
 
     // Copy hosts to app folder
-    let hosts_file_path = app_dir.join("hosts.ini");
+    let hosts_file_path = utils::get_host_config_path();
     if !hosts_file_path.exists() {
         // Copy file content
         let hosts_content = include_str!("../config/hosts.ini");

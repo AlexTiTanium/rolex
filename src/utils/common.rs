@@ -1,16 +1,27 @@
 use configparser::ini::Ini;
-use dirs;
-use std::{collections::HashSet, env};
+use dirs::home_dir;
+use std::{collections::HashSet, env, path::PathBuf};
+
+///
+/// Get app directory
+///
+pub fn get_app_dir() -> PathBuf {
+    let home = home_dir().expect("Home directory not found");
+    return home.join(".rolex");
+}
+
+///
+/// Get hosts config file path
+///
+pub fn get_host_config_path() -> PathBuf {
+    get_app_dir().join("hosts.ini")
+}
 
 ///
 /// Read hosts.ini sections
 ///
 pub fn get_available_hosts() -> Result<HashSet<String>, std::io::Error> {
-    let home_dir = dirs::home_dir().ok_or(std::io::Error::new(
-        std::io::ErrorKind::NotFound,
-        "Home directory not found",
-    ))?;
-    let path = home_dir.join(".rolex/hosts.ini");
+    let path = get_host_config_path();
 
     let mut config = Ini::new();
     config
