@@ -1,4 +1,30 @@
-use std::env;
+use configparser::ini::Ini;
+use dirs;
+use std::{collections::HashSet, env};
+
+///
+/// Read hosts.ini sections
+///
+pub fn get_available_hosts() -> Result<HashSet<String>, std::io::Error> {
+    let home_dir = dirs::home_dir().ok_or(std::io::Error::new(
+        std::io::ErrorKind::NotFound,
+        "Home directory not found",
+    ))?;
+    let path = home_dir.join(".rolex/hosts.ini");
+
+    let mut config = Ini::new();
+    config
+        .load(path)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+
+    let mut available_hosts: HashSet<String> = HashSet::new();
+
+    for section in config.sections() {
+        available_hosts.insert(section);
+    }
+
+    Ok(available_hosts)
+}
 
 ///
 /// Check if app installed on current system

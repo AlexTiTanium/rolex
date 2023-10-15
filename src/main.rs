@@ -6,8 +6,8 @@ mod commands;
 mod utils;
 
 use clap::{App, SubCommand};
-use log::{error, info};
-use std::io::Write;
+use log::{error, info, warn};
+use std::{collections::HashSet, io::Write};
 
 fn main() {
     pretty_env_logger::formatted_timed_builder()
@@ -18,7 +18,7 @@ fn main() {
         })
         .init();
 
-    let matches = App::new("Role Executor CLI tool")
+    let mut app = App::new("Role Executor CLI tool")
         .version("0.1")
         .author("Alex Kucherenko")
         .about("CLI tool for managing server tasks")
@@ -32,16 +32,28 @@ fn main() {
                 .subcommand(
                     SubCommand::with_name("edit").about("Opens hosts.ini in default editor"),
                 ),
-        )
-        // .subcommand(SubCommand::with_name("setup").about("Initial server setup command"))
-        // .subcommand(
-        //     SubCommand::with_name("user").about("Create new user and return back user private key"),
-        // )
-        // .subcommand(SubCommand::with_name("reload").about("Reload service"))
-        .get_matches();
+        );
 
-    match matches.subcommand() {
-        ("install", Some(_)) => {
+    let available_hosts = match utils::get_available_hosts() {
+        Ok(hosts) => hosts,
+        Err(e) => {
+            warn!("Can't read hosts.ini file: {}", e);
+            warn!("Create host file with 'hosts create' command or add new host by: 'hosts edit'");
+            HashSet::new()
+        }
+    };
+
+    // Create dynamic hosts commands
+    for host_group in &available_hosts {
+        app = app.subcommand(
+            SubCommand::with_name(host_group)
+                .about("Host group actions")
+                .subcommand(SubCommand::with_name("setup").about("Setup selected host group")),
+        );
+    }
+
+    match app.get_matches().subcommand() {
+        ("install", _) => {
             commands::install_command();
             commands::hosts_create_command();
         }
@@ -50,6 +62,18 @@ fn main() {
             Some("edit") => commands::hosts_edit_command(),
             _ => error!("Invalid hosts subcommand"),
         },
+        (dynamic_command, Some(sub_matches)) => {
+            if available_hosts.contains(dynamic_command) {
+                match sub_matches.subcommand() {
+                    ("setup", Some(_)) => {
+                        info!("setup server")
+                    }
+                    _ => {
+                        info!("Invalid host command, run with --help for to get available commands")
+                    }
+                }
+            }
+        }
         _ => {
             info!("Invalid command, run with --help for usage.");
         }
