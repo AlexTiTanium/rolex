@@ -5,9 +5,13 @@ extern crate pretty_env_logger;
 mod commands;
 mod utils;
 
-use clap::{App, SubCommand};
+use clap::{App, Arg, SubCommand};
 use log::{error, info, warn};
-use std::{collections::HashSet, io::Write};
+use std::{
+    collections::{HashMap, HashSet},
+    hash::Hash,
+    io::Write,
+};
 
 fn main() {
     pretty_env_logger::formatted_timed_builder()
@@ -45,11 +49,14 @@ fn main() {
 
     // Create dynamic hosts commands
     for host_group in &available_hosts {
-        app = app.subcommand(
-            SubCommand::with_name(host_group)
-                .about("Host group actions")
-                .subcommand(SubCommand::with_name("setup").about("Setup selected host group")),
-        );
+        let hosts_commands = SubCommand::with_name(host_group)
+            .about("Host group actions")
+            .subcommands(vec![
+                get_hosts_install_commands(),
+                get_hosts_user_commands(),
+            ]);
+
+        app = app.subcommand(hosts_commands);
     }
 
     match app.get_matches().subcommand() {
@@ -63,23 +70,68 @@ fn main() {
             _ => error!("Invalid hosts subcommand"),
         },
         (dynamic_command, Some(sub_matches)) => {
-            if available_hosts.contains(dynamic_command) {
-                match sub_matches.subcommand() {
-                    ("setup", Some(_)) => {
-                        commands::run_playbook(
-                            dynamic_command,
-                            "setup",
-                            include_str!("playbooks/setup.yml"),
-                        );
-                    }
-                    _ => {
-                        info!("Invalid host command, run with --help for to get available commands")
-                    }
-                }
-            }
+            handle_host_commands(dynamic_command, sub_matches, &available_hosts);
         }
         _ => {
-            info!("Invalid command, run with --help for usage.");
+            error!("Invalid command, run with --help for usage.");
+        }
+    }
+}
+
+fn get_hosts_install_commands() -> App<'static, 'static> {
+    SubCommand::with_name("install")
+        .about("Install application on selected host group")
+        .subcommand(SubCommand::with_name("caddy").about("Install Caddy web server"))
+}
+
+fn get_hosts_user_commands() -> App<'static, 'static> {
+    SubCommand::with_name("user")
+        .about("Manage users on server")
+        .subcommand(
+            SubCommand::with_name("add")
+                .about("Add new user on server")
+                .arg_from_usage("<user> 'The username to add'"),
+        )
+}
+
+fn handle_host_commands(
+    host: &str,
+    sub_matches: &clap::ArgMatches,
+    available_hosts: &HashSet<String>,
+) {
+    // If not host
+    if !available_hosts.contains(host) {
+        return;
+    }
+
+    match sub_matches.subcommand() {
+        ("install", Some(install_matches)) => handle_host_install_commands(install_matches),
+        ("user", Some(user_matches)) => handle_host_user_commands(user_matches),
+        _ => {
+            error!("Invalid host command, run with --help to get available commands");
+        }
+    }
+}
+
+fn handle_host_install_commands(app_matches: &clap::ArgMatches) {
+    match app_matches.subcommand_name() {
+        Some("caddy") => {
+            info!("Install caddy");
+        }
+        _ => {
+            error!("Invalid install subcommand");
+        }
+    }
+}
+
+fn handle_host_user_commands(user_matches: &clap::ArgMatches) {
+    match user_matches.subcommand() {
+        ("add", Some(add_matches)) => {
+            let username = add_matches.value_of("user").unwrap();
+            info!("add user: {}", username);
+        }
+        _ => {
+            error!("Invalid user subcommand");
         }
     }
 }

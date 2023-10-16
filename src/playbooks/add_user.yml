@@ -1,5 +1,5 @@
 ---
-- name: Create new user for host
+- name: Create new user
   hosts: all
   tasks:
     - name: Create new user
