@@ -9,7 +9,7 @@ use crate::utils;
 ///
 /// Command `hosts create`
 ///
-pub fn run_playbook(host_group: &str, playbook: &str, extra_vars: Option<HashMap<String, String>>) {
+pub fn run_playbook(host_group: &str, playbook: &str, extra_vars: Option<HashMap<&str, &str>>) {
     match utils::is_installed("ansible-playbook") {
         Ok(_) => (), // Do nothing
         Err(_) => {

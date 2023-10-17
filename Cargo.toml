@@ -15,5 +15,6 @@ colored = "2.0.4"
 dirs = "5.0.1"
 configparser = "3.0.2"
 tempfile = "3.8.0"
+maplit = "1.0.2"
 
 [build-dependencies]
