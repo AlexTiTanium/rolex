@@ -7,7 +7,7 @@ use std::{collections::HashSet, env, path::PathBuf};
 ///
 pub fn get_app_dir() -> PathBuf {
     let home = home_dir().expect("Home directory not found");
-    return home.join(".rolex");
+    return home.join(".rollit");
 }
 
 ///

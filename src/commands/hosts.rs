@@ -56,7 +56,7 @@ fn open_hosts_in_default_editor() -> std::io::Result<()> {
 }
 
 ///
-/// Create host file at .rolex/hosts.ini
+/// Create host file at .rollit/hosts.ini
 /// In this file we will store all user servers
 ///
 fn create_hosts_config() -> std::io::Result<()> {

@@ -95,5 +95,5 @@
     - name: Fetch private SSH key
       fetch:
         src: "/home/{{ user }}/.ssh/id_ed25519"
-        dest: "~/.rolex/{{ user }}.key"
+        dest: "~/.rollit/{{ user }}.key"
         flat: yes

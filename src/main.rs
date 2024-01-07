@@ -12,7 +12,7 @@ use clap::{App, SubCommand};
 use log::{error, warn};
 use std::{collections::HashSet, io::Write};
 
-/// Entry point for the Rolex CLI tool.
+/// Entry point for the rollit CLI tool.
 /// Initializes the logger, defines command-line arguments, and dispatches them to corresponding handlers.
 fn main() {
     // Setup logger format
@@ -79,13 +79,15 @@ fn main() {
 ///
 /// Examples:
 /// ```
-/// $ rolex host create
-/// $ rolex host edit
+/// $ rollit host create
+/// $ rollit host edit
 /// ```
 fn get_hosts_config_commands() -> App<'static, 'static> {
     SubCommand::with_name("hosts")
         .about("Manage hosts.ini with your servers list")
-        .subcommand(SubCommand::with_name("create").about("Creates hosts.ini at ./rolex/hosts.ini"))
+        .subcommand(
+            SubCommand::with_name("create").about("Creates hosts.ini at ./rollit/hosts.ini"),
+        )
         .subcommand(SubCommand::with_name("edit").about("Opens hosts.ini in default editor"))
 }
 
@@ -93,7 +95,7 @@ fn get_hosts_config_commands() -> App<'static, 'static> {
 ///
 /// # Examples
 /// ```sh
-/// $ rolex {server_group} install caddy
+/// $ rollit {server_group} install caddy
 /// ````
 ///
 fn get_hosts_install_commands() -> App<'static, 'static> {
@@ -106,7 +108,7 @@ fn get_hosts_install_commands() -> App<'static, 'static> {
 ///
 /// # Examples
 /// ```sh
-/// $ rolex {server_group} user add {user_name}
+/// $ rollit {server_group} user add {user_name}
 /// ````
 fn get_hosts_user_commands() -> App<'static, 'static> {
     SubCommand::with_name("user")
@@ -122,8 +124,8 @@ fn get_hosts_user_commands() -> App<'static, 'static> {
 ///
 /// # Example
 /// ```sh
-/// $ rolex {server_group} install {app_name}
-/// $ rolex {server_group} user add {user_name}
+/// $ rollit {server_group} install {app_name}
+/// $ rollit {server_group} user add {user_name}
 /// ````
 ///
 /// # Arguments
@@ -154,7 +156,7 @@ fn handle_host_commands(
 ///
 /// # Example
 /// ```sh
-/// $ rolex {server_group} install caddy
+/// $ rollit {server_group} install caddy
 /// ````
 ///
 /// # Arguments
@@ -176,7 +178,7 @@ fn handle_host_install_commands(host: &str, app_matches: &clap::ArgMatches) {
 ///
 /// Example:
 /// ```
-/// $ rolex {server_group} user add
+/// $ rollit {server_group} user add
 /// ```
 ///
 /// Arguments:
